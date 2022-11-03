@@ -315,43 +315,4 @@ function update() {
                     }
 //DEDULICATION                 
  // function to remove duplicates in array
-                    let dedupeChoiceArray = [...new Set(choiceArray)];
-                    return dedupeChoiceArray;
-                },
-                message: "Please select the employee's new role."
-            }
-        ]).then(answer => {
-            let chosenEmployee;
-            let chosenRole;
-
-            for (let i = 0; i < results.length; i++) {
-                if (results[i].last_name === answer.employee) {
-                    chosenEmployee = results[i];
-                }
-            }
-
-            for (let i = 0; i < results.length; i++) {
-                if (results[i].title === answer.role) {
-                    chosenRole = results[i];
-                }
-            }
-
-            connection.query(
-                "UPDATE employee SET ? WHERE ?",
-                [
-                    {
-                        role_id: chosenRole,
-                    },
-                    {
-                        last_name: chosenEmployee,
-                    }
-                ],
-                (err) => {
-                    if (err) throw err;
-                    console.log(`The new role was successfully updated.`);
-                    start();
-                }
-            )
-        })
-    })
-}
+  
