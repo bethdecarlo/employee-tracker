@@ -109,3 +109,33 @@ function viewAllEmployees() {
         start();
     });
 }
+
+//function to add a new department
+function addNewDept() {
+    inquirer.prompt([
+        {
+            name: "department",
+            type: "input",
+            message: "What is the name of the new department?",
+            validate: (value) => {
+                if (value) {
+                    return true;
+                } else {
+                    console.log("Try again. Department name not added.");
+                }
+            }
+        },
+    ]).then(answer => {
+        connection.query(
+            "INSERT INTO department SET ?",
+            {
+                name: answer.department
+            },
+            (err) => {
+                if (err) throw err;
+                console.log(`New department called ${answer.department} was successfully added.`);
+                start();
+            }
+        );
+    });
+}
