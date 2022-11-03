@@ -4,13 +4,16 @@ Employee Tracker CLI app
     dir assets
         demo.png
     dir db
-        schema.sql
-        seed.sql
+        schema.sql 
+        seed.sql 
 .gitignore
 license
 readme.md
 app.js
 package-lock.json
 package.json
+
+--------------------
+dependencies
 
 
