@@ -39,9 +39,11 @@ function start() {
             "Add a new employee",
             "Update an employee's role",
             "Exit app"
-            
+    ]
+
         // loops through prompt choices
-        ]}.then((answer) => {
+     }).
+        then((answer) => {
             switch (answer.action) {
                 case "View all departments":
                     viewDepts();
