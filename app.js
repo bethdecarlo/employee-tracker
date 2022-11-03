@@ -80,4 +80,32 @@ function start() {
         });
     }
     
-    
+// function to display all departments,
+function viewAllDepts() {
+    connection.query("SELECT * FROM department", (err, data) => {
+        if (err) throw err;
+        console.log("Now viewing all departments:");
+        console.table(data);
+        start();
+    });
+}
+
+// function to display all roles,
+function viewAllRoles() {
+    connection.query("SELECT * FROM role", (err, data) => {
+        if (err) throw err;
+        console.log("Now viewing all roles:");
+        console.table(data);
+        start();
+    });
+}
+
+// function to display all employees,
+function viewAllEmployees() {
+    connection.query("SELECT * FROM employee", (err, data) => {
+        if (err) throw err;
+        console.log("Now viewing all employees:");
+        console.table(data);
+        start();
+    });
+}
