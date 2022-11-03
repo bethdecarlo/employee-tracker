@@ -39,6 +39,43 @@ function start() {
             "Add a new employee",
             "Update an employee's role",
             "Exit app"
-        ]}
-    )
-    // loops through prompt choices
+            
+        // loops through prompt choices
+        ]}.then((answer) => {
+            switch (answer.action) {
+                case "View all departments":
+                    viewDepts();
+                    break;
+    
+                case "View all roles":
+                    viewRoles();
+                    break;
+    
+                case "View all employees":
+                    viewEes();
+                    break;
+    
+                case "Add a department":
+                    addDept();
+                    break;
+    
+                case "Add a role":
+                    addRole();
+                    break;
+    
+                case "Add an employee":
+                    addEe();
+                    break;
+    
+                case "Update employee role":
+                    update();
+                    break;
+    
+                case "Exit":
+                    connection.end();
+                    break;
+            }
+        });
+    }
+    
+    
