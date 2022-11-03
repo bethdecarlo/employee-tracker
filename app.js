@@ -1,17 +1,16 @@
-// node dependencies
-
+//dependencies
 const mysql = require("mysql");
 const inquirer = require("inquirer");
-const figlet = require("figlet");
+// const figlet = require("figlet");
+
+// //figlet application name
+// figlet("Employee \n \n Manager", (err, data) => {
+//     if (err) throw err;
+//     console.log(data);
+// })
 
 
-//title of app... powered by figlet!
-figlet("Employee \n \n Tracker!", (err, data) => {
-    if (err) throw err;
-    console.log(data);
-})
-
-//function to connect to database
+//create the connection for database
 const connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
@@ -22,16 +21,18 @@ const connection = mysql.createConnection({
 
 connection.connect(err => {
     if (err) throw err;
-    console.log('successfully connected to employee_tracker_db');
+    console.log('now connected to employee_tracker_db!');
     start();
 });
 
-// begins inquierer prompt
+// Add departments, roles, employees
+// View departments, roles, employees
+// Update employee roles
 function start() {
     inquirer.prompt({
         name: "action",
         type: "list",
-        message: "What would you like to do?",
+        message: "Please select a task.",
         choices: [
             "View all departments",
             "View all roles",
@@ -41,64 +42,65 @@ function start() {
             "Add a new employee",
             "Update an employee's role",
             "Exit app"
-    ]
+        ]
+    }).then((answer) => {
+        switch (answer.action) {
+            case "View all departments":
+                viewDepts();
+                break;
 
-        // loops through prompt choices
-     }).
-        then((answer) => {
-            switch (answer.action) {
-                case "View all departments":
-                    viewAllDepts();
-                    break;
-    
-                case "View all roles":
-                    viewAllRoles();
-                    break;
-    
-                case "View all employees":
-                    viewAllEmployees();
-                    break;
-    
-                case "Add a department":
-                    addNewDept();
-                    break;
-    
-                case "Add a role":
-                    addNewRole();
-                    break;
-    
-                case "Add an employee":
-                    addNewEmployee();
-                    break;
-    
-                case "Update employee role":
-                    update();
-                    break;
-    
-                case "Exit":
-                    connection.end();
-                    break;
-            }
-        });
-    }
-    
+            case "View all roles":
+                viewRoles();
+                break;
+
+            case "View all employees":
+                viewEmployees();
+                break;
+
+            case "Add a new department":
+                addDept();
+                break;
+
+            case "Add a new role":
+                addRole();
+                break;
+
+            case "Add a new employee":
+                addEmployee();
+                break;
+
+            case "Update an employee's role":
+                update();
+                break;
+
+            case "Exit app":
+                connection.end();
+                break;
+        }
+    });
+}
+
+
+
 //VIEW
 // function to display all departments,
-function viewAllDepts() {
+
+function viewDepts() {
     connection.query("SELECT * FROM department", (err, data) => {
         if (err) throw err;
-        console.log("Now viewing all departments:");
+        console.log("Viewing all departments:");
         console.table(data);
         start();
     });
 }
 
+
 //VIEW
 // function to display all roles,
-function viewAllRoles() {
+function viewRoles() {
     connection.query("SELECT * FROM role", (err, data) => {
         if (err) throw err;
-        console.log("Now viewing all roles:");
+        console.log("Viewing all roles:");
         console.table(data);
         start();
     });
@@ -106,10 +108,10 @@ function viewAllRoles() {
 
 //ADD
 // function to display all employees,
-function viewAllEmployees() {
+function viewEmployees() {
     connection.query("SELECT * FROM employee", (err, data) => {
         if (err) throw err;
-        console.log("Now viewing all employees:");
+        console.log("Displaying all employees:");
         console.table(data);
         start();
     });
@@ -117,17 +119,17 @@ function viewAllEmployees() {
 
 //ADD
 //function to add a new department
-function addNewDept() {
+function addDept() {
     inquirer.prompt([
         {
             name: "department",
             type: "input",
-            message: "What is the name of the new department?",
+            message: "Please enter the name of the new department.",
             validate: (value) => {
                 if (value) {
                     return true;
                 } else {
-                    console.log("Try again. Department name not added.");
+                    console.log("Try again.");
                 }
             }
         },
@@ -139,18 +141,15 @@ function addNewDept() {
             },
             (err) => {
                 if (err) throw err;
-                console.log(`New department called ${answer.department} was successfully added.`);
+                console.log(`${answer.department} was successfully added.`);
                 start();
             }
         );
     });
 }
 
-//ADD
-//function that will add new role 
-// loops through prompting new role, role's salary, and role's department
-
-function addNewRole() {
+// function to Add a role; prompt role, salary and department
+function addRole() {
     const sql = "SELECT * FROM department";
     connection.query(sql, (err, results) => {
         if (err) throw err;
@@ -159,24 +158,24 @@ function addNewRole() {
             {
                 name: "title",
                 type: "input",
-                message: "What is the name of the new role?",
+                message: "Please enter the title of the new role.",
                 validate: (value) => {
                     if (value) {
                         return true;
                     } else {
-                        console.log("Try again. New role not added.");
+                        console.log("Try again.");
                     }
                 }
             },
             {
                 name: "salary",
                 type: "input",
-                message: "What is this role's salary?",
+                message: "Please enter the salary of this role.",
                 validate: (value) => {
                     if (isNaN(value) === false) {
                         return true;
                     }
-                    console.log("Try again. Please enter a number value for the salary.");
+                    console.log("Try again.");
                 }
             },
             {
@@ -189,7 +188,7 @@ function addNewRole() {
                     }
                     return choiceArray;
                 },
-                message: "What department will this new role be in?",
+                message: "Please choose a department for the new role.",
             }
         ]).then(answer => {
             let chosenDept;
@@ -208,7 +207,7 @@ function addNewRole() {
                 },
                 (err) => {
                     if (err) throw err;
-                    console.log(`New role ${answer.title} has been added!`);
+                    console.log(`${answer.title} was successfully added as a new role.`);
                     start();
                 }
             )
@@ -216,11 +215,8 @@ function addNewRole() {
     });
 }
 
-//ADD
-//function to add a new employee
-
-
-function addNewEmployee() {
+// function to Add an employee
+function addEmployee() {
     const sql = "SELECT * FROM employee, role";
     connection.query(sql, (err, results) => {
         if (err) throw err;
@@ -229,24 +225,24 @@ function addNewEmployee() {
             {
                 name: "firstName",
                 type: "input",
-                message: "What is the employee's first name?",
+                message: "Please enter the employee's first name.",
                 validate: (value) => {
                     if (value) {
                         return true;
                     } else {
-                        console.log("Try again. Enter a first name.");
+                        console.log("Try again.");
                     }
                 }
             },
             {
                 name: "lastName",
                 type: "input",
-                message: "What is the employee's last name?",
+                message: "Please enter the employee's last name.",
                 validate: (value) => {
                     if (value) {
                         return true;
                     } else {
-                        console.log("Try again. Enter a last name.");
+                        console.log("Try again.");
                     }
                 }
             },
@@ -254,15 +250,16 @@ function addNewEmployee() {
                 name: "role",
                 type: "rawlist",
                 choices: () => {
-                    let updateArray = [];
+                    let choiceArray = [];
                     for (let i = 0; i < results.length; i++) {
-                        updateArray.push(results[i].title);
+                        choiceArray.push(results[i].title);
                     }
-                    let removeDuplicateArray = [...new Set(updateArray)];
-                    return removeDuplicateArray;
-                },
 
-                message: "What is the role?"
+    // function to remove duplicates in array
+                    let dedupeChoiceArray = [...new Set(choiceArray)];
+                    return dedupeChoiceArray;
+                },
+                message: "Please select the employee's role."
             }
         ]).then(answer => {
             let chosenRole;
@@ -282,7 +279,7 @@ function addNewEmployee() {
                 },
                 (err) => {
                     if (err) throw err;
-                    console.log(`${answer.firstName} ${answer.lastName} has been added as a ${answer.role}!`);
+                    console.log(`${answer.firstName} ${answer.lastName} was successfully added as a(n) ${answer.role}`);
                     start();
                 }
             )
@@ -290,9 +287,7 @@ function addNewEmployee() {
     });
 }
 
-//UPDATE
-// function to update an active employee's role
-
+// function to Update employee role
 function update() {
     connection.query("SELECT * FROM employee, role", (err, results) => {
         if (err) throw err;
@@ -302,29 +297,30 @@ function update() {
                 name: "employee",
                 type: "rawlist",
                 choices: () => {
-                    let updateArray = [];
+                    let choiceArray = [];
                     for (let i = 0; i < results.length; i++) {
-                        updateArray.push(results[i].last_name);
+                        choiceArray.push(results[i].last_name);
                     }
-                    //remove duplicates
-                    let removeDuplicateArray = [...new Set(updateArray)];
-                    return removeDuplicateArray;
+
+// function to remove duplicates in array
+                    let dedupeChoiceArray = [...new Set(choiceArray)];
+                    return dedupeChoiceArray;
                 },
-                message: "Which employee would you like to update?"
+                message: "Please select an employee to update."
             },
             {
                 name: "role",
                 type: "rawlist",
                 choices: () => {
-                    let updateArray = [];
+                    let choiceArray = [];
                     for (let i = 0; i < results.length; i++) {
-                        updateArray.push(results[i].title);
+                        choiceArray.push(results[i].title);
                     }
-                    //remove duplicates
-                    let removeDuplicateArray = [...new Set(choiceArray)];
-                    return removeDuplicateArray;
+ // function to remove duplicates in array
+                    let dedupeChoiceArray = [...new Set(choiceArray)];
+                    return dedupeChoiceArray;
                 },
-                message: "What is the employee's new role?"
+                message: "Please select the employee's new role."
             }
         ]).then(answer => {
             let chosenEmployee;
@@ -354,7 +350,7 @@ function update() {
                 ],
                 (err) => {
                     if (err) throw err;
-                    console.log(`The employee's new role has been updated!`);
+                    console.log(`The new role was successfully updated.`);
                     start();
                 }
             )
