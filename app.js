@@ -82,6 +82,7 @@ function start() {
         });
     }
     
+//VIEW
 // function to display all departments,
 function viewAllDepts() {
     connection.query("SELECT * FROM department", (err, data) => {
@@ -92,6 +93,7 @@ function viewAllDepts() {
     });
 }
 
+//VIEW
 // function to display all roles,
 function viewAllRoles() {
     connection.query("SELECT * FROM role", (err, data) => {
@@ -102,6 +104,7 @@ function viewAllRoles() {
     });
 }
 
+//ADD
 // function to display all employees,
 function viewAllEmployees() {
     connection.query("SELECT * FROM employee", (err, data) => {
@@ -112,6 +115,7 @@ function viewAllEmployees() {
     });
 }
 
+//ADD
 //function to add a new department
 function addNewDept() {
     inquirer.prompt([
@@ -142,6 +146,7 @@ function addNewDept() {
     });
 }
 
+//ADD
 //function that will add new role 
 // loops through prompting new role, role's salary, and role's department
 
@@ -211,6 +216,7 @@ function addNewRole() {
     });
 }
 
+//ADD
 //function to add a new employee
 
 
@@ -248,11 +254,11 @@ function addNewEmployee() {
                 name: "role",
                 type: "rawlist",
                 choices: () => {
-                    let newEmpArray = [];
+                    let updateArray = [];
                     for (let i = 0; i < results.length; i++) {
-                        newEmpArray.push(results[i].title);
+                        updateArray.push(results[i].title);
                     }
-                    let removeDuplicateArray = [...new Set(newEmpArray)];
+                    let removeDuplicateArray = [...new Set(updateArray)];
                     return removeDuplicateArray;
                 },
 
@@ -282,4 +288,76 @@ function addNewEmployee() {
             )
         });
     });
+}
+
+//UPDATE
+// function to update an active employee's role
+
+function update() {
+    connection.query("SELECT * FROM employee, role", (err, results) => {
+        if (err) throw err;
+
+        inquirer.prompt([
+            {
+                name: "employee",
+                type: "rawlist",
+                choices: () => {
+                    let updateArray = [];
+                    for (let i = 0; i < results.length; i++) {
+                        updateArray.push(results[i].last_name);
+                    }
+                    //remove duplicates
+                    let removeDuplicateArray = [...new Set(updateArray)];
+                    return removeDuplicateArray;
+                },
+                message: "Which employee would you like to update?"
+            },
+            {
+                name: "role",
+                type: "rawlist",
+                choices: () => {
+                    let updateArray = [];
+                    for (let i = 0; i < results.length; i++) {
+                        updateArray.push(results[i].title);
+                    }
+                    //remove duplicates
+                    let removeDuplicateArray = [...new Set(choiceArray)];
+                    return removeDuplicateArray;
+                },
+                message: "What is the employee's new role?"
+            }
+        ]).then(answer => {
+            let chosenEmployee;
+            let chosenRole;
+
+            for (let i = 0; i < results.length; i++) {
+                if (results[i].last_name === answer.employee) {
+                    chosenEmployee = results[i];
+                }
+            }
+
+            for (let i = 0; i < results.length; i++) {
+                if (results[i].title === answer.role) {
+                    chosenRole = results[i];
+                }
+            }
+
+            connection.query(
+                "UPDATE employee SET ? WHERE ?",
+                [
+                    {
+                        role_id: chosenRole,
+                    },
+                    {
+                        last_name: chosenEmployee,
+                    }
+                ],
+                (err) => {
+                    if (err) throw err;
+                    console.log(`The employee's new role has been updated!`);
+                    start();
+                }
+            )
+        })
+    })
 }
