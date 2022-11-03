@@ -10,7 +10,7 @@ Employee Tracker CLI app
 license
 readme.md
 app.js
-package-lock.json
+package-lock.json/ modules
 package.json
 
 --------------------
