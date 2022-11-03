@@ -1,10 +1,12 @@
 // node dependencies
-const figlet = require("figlet");
+
 const mysql = require("mysql");
 const inquirer = require("inquirer");
+const figlet = require("figlet");
+
 
 //title of app... powered by figlet!
-figlet("Welcome to \n \n Employee \n \n Tracker!", (err, data) => {
+figlet("Employee \n \n Tracker!", (err, data) => {
     if (err) throw err;
     console.log(data);
 })
@@ -202,6 +204,79 @@ function addNewRole() {
                 (err) => {
                     if (err) throw err;
                     console.log(`New role ${answer.title} has been added!`);
+                    start();
+                }
+            )
+        });
+    });
+}
+
+//function to add a new employee
+
+
+function addNewEmployee() {
+    const sql = "SELECT * FROM employee, role";
+    connection.query(sql, (err, results) => {
+        if (err) throw err;
+
+        inquirer.prompt([
+            {
+                name: "firstName",
+                type: "input",
+                message: "What is the employee's first name?",
+                validate: (value) => {
+                    if (value) {
+                        return true;
+                    } else {
+                        console.log("Try again. Enter a first name.");
+                    }
+                }
+            },
+            {
+                name: "lastName",
+                type: "input",
+                message: "What is the employee's last name?",
+                validate: (value) => {
+                    if (value) {
+                        return true;
+                    } else {
+                        console.log("Try again. Enter a last name.");
+                    }
+                }
+            },
+            {
+                name: "role",
+                type: "rawlist",
+                choices: () => {
+                    let newEmpArray = [];
+                    for (let i = 0; i < results.length; i++) {
+                        newEmpArray.push(results[i].title);
+                    }
+                    let removeDuplicateArray = [...new Set(newEmpArray)];
+                    return removeDuplicateArray;
+                },
+
+                message: "What is the role?"
+            }
+        ]).then(answer => {
+            let chosenRole;
+
+            for (let i = 0; i < results.length; i++) {
+                if (results[i].title === answer.role) {
+                    chosenRole = results[i];
+                }
+            }
+
+            connection.query(
+                "INSERT INTO employee SET ?",
+                {
+                    first_name: answer.firstName,
+                    last_name: answer.lastName,
+                    role_id: chosenRole.id,
+                },
+                (err) => {
+                    if (err) throw err;
+                    console.log(`${answer.firstName} ${answer.lastName} has been added as a ${answer.role}!`);
                     start();
                 }
             )
